@@ -1,0 +1,258 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum ProductStatus {
+  ACTIVE
+  DISABLED
+  ARCHIVED
+}
+
+enum OrderStatus {
+  AWAITING_PAYMENT
+  PLACED
+  PAYMENT_CONFIRMED
+  PREPARING
+  PACKED
+  SHIPPED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  CREATED
+  PAID
+  FAILED
+}
+
+enum EmailCodePurpose {
+  LOGIN
+  VERIFY_EMAIL
+}
+
+enum AssetKind {
+  IMAGE
+  FRAME_SEQUENCE
+}
+
+model Customer {
+  id                String              @id @default(cuid())
+  fullName          String
+  mobile            String?             @unique
+  email             String?             @unique
+  emailVerifiedAt   DateTime?
+  age               Int?
+  preferredLanguage String              @default("ta")
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  credential        CustomerCredential?
+  addresses         Address[]
+  cart              Cart?
+  orders            Order[]
+}
+
+model CustomerCredential {
+  id           String   @id @default(cuid())
+  customerId   String   @unique
+  passwordHash String
+  updatedAt    DateTime @updatedAt
+  customer     Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model EmailVerificationCode {
+  id         String           @id @default(cuid())
+  email      String
+  codeHash   String
+  purpose    EmailCodePurpose
+  customerId String?
+  attempts   Int              @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime         @default(now())
+
+  @@index([email, createdAt])
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  customerId String
+  fullName   String
+  mobile     String
+  line1      String
+  line2      String
+  landmark   String?
+  city       String
+  district   String
+  state      String
+  pincode    String
+  country    String   @default("India")
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+}
+
+// name / shortDesc / story / material / craftsmanship / care are {ta, en, ml} objects.
+model Product {
+  id             String        @id @default(cuid())
+  slug           String        @unique
+  name           Json
+  shortDesc      Json
+  story          Json
+  material       Json
+  craftsmanship  Json
+  care           Json
+  heightCm       Int?
+  weightGrams    Int?
+  price          Int
+  offerPrice     Int?
+  stock          Int           @default(0)
+  lowStockAt     Int           @default(3)
+  status         ProductStatus @default(ACTIVE)
+  featured       Boolean       @default(false)
+  sortOrder      Int           @default(0)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  assets         ProductAsset[]
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+}
+
+// IMAGE: url + alt. FRAME_SEQUENCE: meta = { base, pattern, count, pad, width, height, fps }
+model ProductAsset {
+  id        String    @id @default(cuid())
+  productId String
+  kind      AssetKind @default(IMAGE)
+  url       String
+  alt       Json?
+  meta      Json?
+  sortOrder Int       @default(0)
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
+
+model Cart {
+  id         String     @id @default(cuid())
+  customerId String     @unique
+  updatedAt  DateTime   @updatedAt
+  customer   Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items      CartItem[]
+}
+
+model CartItem {
+  id        String  @id @default(cuid())
+  cartId    String
+  productId String
+  quantity  Int
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, productId])
+}
+
+model Order {
+  id                String               @id @default(cuid())
+  orderNumber       String               @unique
+  customerId        String
+  status            OrderStatus          @default(AWAITING_PAYMENT)
+  subtotal          Int
+  shippingFee       Int                  @default(0)
+  total             Int
+  currency          String               @default("INR")
+  address           Json
+  estimatedFrom     DateTime?
+  estimatedTo       DateTime?
+  courierName       String?
+  trackingNumber    String?
+  trackingUrl       String?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  customer          Customer             @relation(fields: [customerId], references: [id])
+  items             OrderItem[]
+  payments          Payment[]
+  events            OrderTrackingEvent[]
+
+  @@index([customerId, createdAt])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  name      Json
+  imageUrl  String?
+  unitPrice Int
+  quantity  Int
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Payment {
+  id                 String        @id @default(cuid())
+  orderId            String
+  provider           String        @default("razorpay")
+  razorpayOrderId    String        @unique
+  razorpayPaymentId  String?
+  amount             Int
+  status             PaymentStatus @default(CREATED)
+  failureReason      String?
+  paidAt             DateTime?
+  createdAt          DateTime      @default(now())
+  order              Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+model OrderTrackingEvent {
+  id           String      @id @default(cuid())
+  orderId      String
+  status       OrderStatus
+  note         String?
+  byAdmin      Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  order        Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
+}
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  actorEmail String
+  action     String
+  entity     String
+  entityId   String?
+  detail     Json?
+  createdAt  DateTime @default(now())
+}
+
+// Key/value site settings (delivery configuration lives under key "delivery").
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+// Fixed-window counters for rate limiting on serverless (no shared memory).
+model RateLimit {
+  key     String   @id
+  count   Int
+  resetAt DateTime
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  contact   String
+  message   String
+  createdAt DateTime @default(now())
+}

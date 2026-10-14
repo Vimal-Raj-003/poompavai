@@ -66,44 +66,77 @@
   .langsw button { padding: 5px 7px; }
 }
 
+/* ---------- header refinements (roomier, readable branding) ---------- */
+.hdr .wrap { max-width: 1480px; padding-inline: clamp(16px, 2.6vw, 40px); }
+.logo__ta { font-size: 0.92rem; letter-spacing: 0.08em; color: #ecd59a; font-weight: 500; }
+.logo--light .logo__ta { color: #ecd59a; }
+.hdr__nav { gap: clamp(14px, 1.6vw, 26px); }
+.hdr__link { font-size: 0.94rem; }
+.hdr__right { gap: clamp(10px, 1.2vw, 18px); }
+.hdr__auth { gap: 12px; }
+.hdr__auth .btn { min-height: 40px; padding: 6px 18px; font-size: 0.9rem; }
+@media (min-width: 1000px) and (max-width: 1240px) {
+  .logo__mark { display: none; }
+  .logo__name { font-size: 1.3rem; letter-spacing: 0.13em; }
+  .hdr__link { font-size: 0.9rem; }
+}
+
 /* ---------- hero ---------- */
-.hero { --stage-h: clamp(440px, 128vw, 700px); grid-template-columns: minmax(0, 1fr); position: relative; background: var(--maroon-deep); color: var(--ivory); display: grid; overflow: hidden; isolation: isolate; }
+.hero { --stage-h: clamp(440px, 126vw, 700px); grid-template-columns: minmax(0, 1fr); position: relative; background: var(--maroon-deep); color: var(--ivory); display: grid; overflow: hidden; isolation: isolate; }
 .hero__temple { position: absolute; z-index: 0; top: 0; left: 0; right: 0; height: var(--stage-h); }
 .hero__temple img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 38%; }
-.hero__temple::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(53, 9, 10, 0.12) 0%, rgba(53, 9, 10, 0.05) 45%, var(--maroon-deep) 100%); }
-.hero__doll { position: relative; z-index: 1; height: var(--stage-h); display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; padding: 0 var(--gutter) 18px; }
-.nicheframe { position: relative; width: min(54vw, 270px); padding: 7px; border-radius: 999px 999px 14px 14px; background: linear-gradient(160deg, #e3c985, #a8803a 45%, #e3c985); box-shadow: 0 24px 50px -18px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(53, 9, 10, 0.6); }
-.nicheframe .framedoll { border-radius: 999px 999px 8px 8px; overflow: hidden; background: #c7cfc8; }
-.hero__caption { margin: 12px 0 0; font-size: 0.85rem; color: var(--gold-light); display: flex; align-items: center; gap: 8px; max-width: 54vw; line-height: 1.4; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7); }
-.hero__caption svg { width: 18px; height: 18px; flex: none; }
-.hero__copy { position: relative; z-index: 1; padding: 6px var(--gutter) 44px; }
-.hero__brand { display: block; font-family: var(--f-display); font-weight: 700; letter-spacing: 0.34em; font-size: 0.95rem; color: var(--gold-light); margin-bottom: 10px; }
-.hero__eyebrow { display: block; font-size: 0.82rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(248, 241, 227, 0.75); margin-bottom: 14px; font-weight: 600; }
-html[lang='ta'] .hero__eyebrow, html[lang='ml'] .hero__eyebrow { letter-spacing: 0.04em; text-transform: none; font-size: 0.95rem; }
-.hero h1 { color: var(--ivory); font-size: clamp(1.9rem, 6.4vw, 2.7rem); margin-bottom: 14px; text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45); }
-.hero__sub { color: rgba(248, 241, 227, 0.9); font-size: 1.05rem; max-width: 52ch; margin-bottom: 26px; }
-.hero__cta { display: grid; gap: 12px; }
-.hero__cta .btn { width: 100%; }
+/* only a light fade into the page colour; the gopuram stays bright */
+.hero__temple::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(53, 9, 10, 0.1) 0%, rgba(53, 9, 10, 0) 50%, var(--maroon-deep) 100%); }
+
+.hero__doll { position: relative; z-index: 1; height: var(--stage-h); display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; padding: 0 var(--gutter) 12px; }
+.hero__doll::before { content: ''; position: absolute; left: -6%; bottom: 6%; width: 78%; height: 70%; background: radial-gradient(closest-side, rgba(236, 213, 154, 0.3), rgba(236, 213, 154, 0) 100%); pointer-events: none; z-index: -1; }
+/* The studio photo melts into the scene: its edges fade out instead of sitting in a hard frame. */
+.nicheframe { position: relative; width: min(60vw, 300px); filter: drop-shadow(0 22px 22px rgba(0, 0, 0, 0.55)); }
+.nicheframe .framedoll { background: transparent; filter: brightness(0.8) contrast(1.1) saturate(1.08) sepia(0.12);
+  -webkit-mask-image: radial-gradient(ellipse 46% 57% at 50% 50%, #000 78%, transparent 100%);
+  mask-image: radial-gradient(ellipse 46% 57% at 50% 50%, #000 78%, transparent 100%); }
+
+/* heritage label: ornamental hairlines either side of a small serif caption */
+.hero__caption { margin: 4px 0 0; display: flex; align-items: center; gap: 10px; width: min(60vw, 300px); font-family: var(--f-display); font-style: italic; font-size: 0.98rem; line-height: 1.3; color: var(--gold-light); text-shadow: 0 1px 8px rgba(0, 0, 0, 0.75); justify-content: center; text-align: center; }
+.hero__caption::before, .hero__caption::after { content: ''; height: 1px; flex: 1; min-width: 12px; background: linear-gradient(90deg, transparent, var(--gold)); }
+.hero__caption::after { transform: scaleX(-1); }
+.hero__caption svg { display: none; }
+
+.hero__copy { position: relative; z-index: 1; padding: 8px var(--gutter) 44px; }
+.hero__brand { display: block; font-family: var(--f-display); font-weight: 700; letter-spacing: 0.34em; font-size: 0.95rem; color: var(--gold-light); margin-bottom: 8px; }
+.hero__eyebrow { display: block; font-size: 0.8rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(248, 241, 227, 0.78); margin-bottom: 12px; font-weight: 600; }
+html[lang='ta'] .hero__eyebrow, html[lang='ml'] .hero__eyebrow { letter-spacing: 0.03em; text-transform: none; font-size: 0.95rem; }
+.hero h1 { color: var(--ivory); font-size: clamp(1.9rem, 6.2vw, 2.5rem); line-height: 1.14; margin-bottom: 12px; max-width: 12.5em; text-wrap: balance; text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5); }
+html[lang='ta'] .hero h1, html[lang='ml'] .hero h1 { line-height: 1.34; max-width: 17em; }
+.hero__sub { color: rgba(248, 241, 227, 0.92); font-size: 1.02rem; max-width: 46ch; margin-bottom: 22px; text-wrap: pretty; }
+.hero__cta { display: flex; flex-wrap: wrap; gap: 12px; }
+.hero__cta .btn { min-height: 48px; padding: 8px 26px; font-size: 0.95rem; flex: 1 1 200px; }
+.hero__cta .btn--ghost-light { border-color: rgba(248, 241, 227, 0.55); background: transparent; font-weight: 500; }
 
 .framedoll { position: relative; width: 100%; }
 .framedoll canvas, .framedoll__poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .framedoll canvas { opacity: 0; }
 .framedoll.is-ready canvas { opacity: 1; }
 
-@media (min-width: 640px) {
-  .hero__cta { grid-template-columns: auto auto; justify-content: start; }
-  .hero__cta .btn { width: auto; }
-}
 @media (min-width: 900px) {
-  .hero { --stage-h: auto; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-rows: 1fr; min-height: clamp(640px, calc(100svh - var(--header-h)), 860px); align-items: end; }
-  .hero__temple { left: auto; width: 62%; top: 0; bottom: 0; height: auto; }
-  .hero__temple img { object-position: 24% 30%; }
-  .hero__temple::after { background: linear-gradient(90deg, var(--maroon-deep) 0%, rgba(53, 9, 10, 0.55) 14%, rgba(53, 9, 10, 0) 38%), linear-gradient(0deg, rgba(40, 8, 8, 0.92) 0%, rgba(40, 8, 8, 0.62) 38%, rgba(40, 8, 8, 0) 70%); }
-  .hero__doll { height: auto; grid-column: 1; grid-row: 1; align-self: stretch; justify-content: center; align-items: center; padding: 36px 0 36px var(--gutter); }
-  .nicheframe { width: min(100%, calc((100svh - var(--header-h) - 150px) * 0.667), 400px); }
-  .hero__caption { max-width: 100%; justify-content: center; }
-  .hero__copy { grid-column: 2; grid-row: 1; align-self: end; padding: 0 var(--gutter) 64px 4%; max-width: 760px; }
-  .hero h1 { font-size: clamp(2.2rem, 3.6vw, 3.3rem); }
+  .hero { --stage-h: auto; grid-template-columns: minmax(0, 40fr) minmax(0, 60fr); grid-template-rows: 1fr; min-height: clamp(600px, calc(100svh - var(--header-h)), 800px); align-items: end; }
+  .hero__temple { left: auto; width: 68%; top: 0; bottom: 0; height: auto; }
+  .hero__temple img { object-position: 22% 30%; }
+  /* soft blend from the maroon left into the temple; no dark wash over the tower */
+  .hero__temple::after { background: linear-gradient(90deg, var(--maroon-deep) 0%, rgba(53, 9, 10, 0.5) 16%, rgba(53, 9, 10, 0) 40%), linear-gradient(0deg, rgba(40, 8, 8, 0.55) 0%, rgba(40, 8, 8, 0) 28%); }
+  .hero__doll { height: auto; grid-column: 1; grid-row: 1; align-self: stretch; justify-content: center; align-items: center; padding: 20px 0 20px clamp(16px, 3vw, 48px); }
+  .hero__doll::before { left: 4%; bottom: 14%; width: 92%; height: 66%; }
+  .nicheframe { width: min(100%, calc((100svh - var(--header-h) - 100px) * 0.7), 500px); }
+  .hero__caption { width: min(100%, 360px); margin-top: -6px; }
+  .hero__copy { grid-column: 2; grid-row: 1; align-self: center; padding: 40px clamp(24px, 4vw, 72px) 40px clamp(16px, 2.4vw, 40px); max-width: 780px; }
+  /* dark gradient behind the text block only */
+  .hero__copy::before { content: ''; position: absolute; z-index: -1; inset: -22% -10% -22% -22%; background: radial-gradient(ellipse closest-side at 46% 50%, rgba(34, 6, 6, 0.8) 0%, rgba(34, 6, 6, 0.62) 50%, rgba(34, 6, 6, 0) 100%); pointer-events: none; }
+  .hero h1 { font-size: clamp(2.1rem, 3.1vw, 3rem); }
+  .hero__cta { gap: 14px; }
+  .hero__cta .btn { flex: 0 0 auto; }
+}
+@media (max-width: 899px) {
+  .hero__copy::before { content: ''; position: absolute; z-index: -1; inset: 0; background: linear-gradient(180deg, rgba(53, 9, 10, 0) 0%, var(--maroon-deep) 22%); pointer-events: none; }
 }
 
 /* ---------- story ---------- */
